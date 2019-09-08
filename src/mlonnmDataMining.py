@@ -87,15 +87,15 @@ def source(p, q, r, *meshgrid):
 
 def combinations(*args):
     """
-    creates a list of lists of all possible combinations of the values of the \
-    input lists
-    -----------
-    each input list contains the different values that the corresponding feature
-    takes  
+    It takes all the feature-lists, where each feature-list contains the
+    different values  
+    that the corresponding feature takes, and creates all possible combinations.
+    Namely,  
+    every combination (simulation configuration) will have one value of each
+    feature-list.
 
-    @param *args       : iterable of iterables  
-    @param comb_list   : the list that will hold the combinations (default: [])  
-    returns comb_list
+    @param *args         : iterable of iterables (list of feature-lists)  
+    returns comb_list    : iterable of iterables (list of combinations)
     """
     comb_list = []
     for values in itertools.product(*args):

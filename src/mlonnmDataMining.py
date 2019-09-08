@@ -146,22 +146,24 @@ def initialization(L, W, Nx, Ny, u_top, u_bot, f, *meshgrid):
 
     # vertical interpolation
     y_borders_values = np.array([0, W])
-    u_vert_borders_values = np.array([[u[ 0,  i], u[-1,  i]] for i in range(Nx)])
+    u_vert_borders_values = np.array([[u[0, i], u[-1, i]] for i in range(Nx)])
     yvals = np.linspace(0, W, Ny)
 
     uy_inter = np.zeros_like(u)
     for column in range(Nx):
-        uy_inter[:, column] = np.interp(yvals, y_borders_values, u_vert_borders_values[column])
+        uy_inter[:, column] = np.interp(yvals, y_borders_values,
+                                        u_vert_borders_values[column])
 
     """
     # horizontal interpolation
     x_borders_values = np.array([0, L])
-    u_hor_borders_values = np.array([[u[i,  0], u[i,  -1]] for i in range(Ny)])
+    u_hor_borders_values = np.array([[u[i, 0], u[i, -1]] for i in range(Ny)])
     xvals = np.linspace(0, L, Nx)
 
     ux_inter = np.zeros_like(u)
     for row in range(Ny):
-        ux_inter[row, :] = np.interp(xvals, x_borders_values, u_hor_borders_values[row])
+        ux_inter[row, :] = np.interp(xvals, x_borders_values,
+                                     u_hor_borders_values[row])
 
 
     # final interpolation as the mean of verical and horizontal
@@ -202,8 +204,8 @@ def main():
 
     # features (dimensions) of the problem (9)
     # --------
-    # (expressed with ranges, in order to later produce the different compinations,
-    # that will constitute the data-set)
+    # (expressed with ranges, in order to later produce the different
+    # compinations, that will constitute the data-set)
     # {
     #
     # grid boundaries
@@ -280,8 +282,8 @@ def main():
         a0, a1, a2, a3, a4 = factors(perm)
 
         # this will hold the number of the iterations needed with the previous
-        # relaxation factor, in order to compare it with the current one and, thus,
-        # to perform a binary research of the optimum omega
+        # relaxation factor, in order to compare it with the current one and,
+        # thus, to perform a binary research of the optimum omega
         iterations = __ITER_MAX__
 
         # this will hold the optimum_omega for the binary research
@@ -304,17 +306,19 @@ def main():
                     # - top and bot    : Dirichlet (set at initialization)
                     # - left and right : Neumann   (du/dx = df/dx)
                     boundaryConditions(u, f)
-                    
+
                     # Successive Over Relaxation scheme
                     # ---------------------------------
                     #                                      a2
-                    # u_new(i,j) = u(i,j) + omega/a0 [{a3 -a0 a1} u(i,j) - h^2 f(i,j)]
+                    # u_new(i,j) = u(i,j) + omega/a0 [{a3 -a0 a1} u(i,j)
                     #                                      a4
+                    #                                 - h^2 f(i,j)]
+                    #
                     u_new = u[1:-1, 1:-1] + omega / a0 * (  a3 * u[1:-1,  :-2]
-                                                        + a2 * u[2:  , 1:-1]
-                                                        + a1 * u[1:-1, 2:  ]
-                                                        + a4 * u[ :-2, 1:-1]
-                                                        - a0 * u[1:-1, 1:-1]
+                                                          + a2 * u[2:  , 1:-1]
+                                                          + a1 * u[1:-1, 2:  ]
+                                                          + a4 * u[ :-2, 1:-1]
+                                                          - a0 * u[1:-1, 1:-1]
                                                         - h**2 * f[1:-1, 1:-1] )
                     # mean residual of the nodes
                     tolerance = np.sum(np.abs(u_new - u[1:-1, 1:-1])) \
@@ -356,7 +360,8 @@ def main():
     df['time'] = time_array
     df['tolerance'] = tolerance_array
 
-    with pd.option_context('display.max_rows', None, 'display.max_columns', None):
+    with pd.option_context('display.max_rows', None,
+                           'display.max_columns', None):
         print(df)
 
     """

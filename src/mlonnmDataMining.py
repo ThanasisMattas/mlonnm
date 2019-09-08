@@ -137,7 +137,7 @@ def initialization(L, W, Nx, Ny, u_top, u_bot, f, *meshgrid):
     
     # populate the mesh with function u
     u = np.zeros_like(X)
-    # apply boundary Dirichlet conditions
+    # apply Dirichlet boundary conditions
     u[ 0, :] = u_top
     u[-1, :] = u_bot
     # u[:, 0] = u_left

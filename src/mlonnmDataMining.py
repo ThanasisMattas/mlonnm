@@ -134,7 +134,7 @@ def initialization(L, W, Nx, Ny, u_top, u_bot, f, *meshgrid):
     interpolation of the values on the boundaries
     """
     X, Y = meshgrid
-    
+
     # populate the mesh with function u
     u = np.zeros_like(X)
     # apply Dirichlet boundary conditions
@@ -170,7 +170,7 @@ def initialization(L, W, Nx, Ny, u_top, u_bot, f, *meshgrid):
     u[1:-1, 1:-1] = (uy_inter[1:-1, 1:-1] + ux_inter[1:-1, 1:-1]) / 2
     """
     u[1:-1, 1:-1] = uy_inter[1:-1, 1:-1]
-    
+
     return u
 
 
@@ -241,8 +241,8 @@ def main():
     print(len(dataset))
 
     # print dataset in pandas DataFrame format
-    test_some_indices = [0, 1000, 2000, 10000, 15000]
-    df = pd.DataFrame([dataset[point] for point in test_some_indices],
+    test_indices = [0, 1000, 2000, 10000, 15000]
+    df = pd.DataFrame([dataset[point] for point in test_indices],
         columns=['L', 'W', 'h', 'a', 'b', 'c', 'p', 'q', 'r', 'u_top', 'u_bot'])
     # print(df[:1])
 
@@ -255,7 +255,7 @@ def main():
     tolerance_array = np.array([])
 
     # iterate through each data-point, to find its optimum relaxation factor
-    for datapoint in test_some_indices:
+    for datapoint in test_indices:
         # time each datapoint
         start = timer()
 
@@ -292,11 +292,11 @@ def main():
         tol = __TOL__
 
         # iterate through the values of the relaxation factor, omega
-        for omega in np.arange(0.2, 1.2, 0.2):       # np.arange(0.2, 2.2, 0.2)
+        for omega in np.arange(0.2, 1.2, 0.2):
             # solution
             iter = 0
             tolerance = 2
-            while tolerance > __TOL__ and iter < __ITER_MAX__:      # __ITER_MAX__
+            while tolerance > __TOL__ and iter < __ITER_MAX__:
                 try:
                     iter += 1
 
@@ -344,7 +344,7 @@ def main():
         sec_zeros = (2 - len(str(sec))) * '0'
         dtpoint_duration = min_zeros + min + ':' + sec_zeros + sec
 
-        # append values to the dataset matrix
+        # append values to the corresponding arrays
         optimum_omega_array = np.append(optimum_omega_array, omega_optimum)
         iters_array = np.append(iters_array, iterations)
         time_array = np.append(time_array, dtpoint_duration)
@@ -355,6 +355,7 @@ def main():
     # print(time_array)
     # print(tolerance_array)
 
+    # append columns to the dataset matrix
     df['omega_opt'] = optimum_omega_array
     df['iterations'] = iters_array
     df['time'] = time_array
@@ -387,7 +388,7 @@ def main():
 
     plt.show()
     """
-            
+
 
 if __name__ == '__main__':
     main()

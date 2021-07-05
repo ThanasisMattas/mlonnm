@@ -1,19 +1,17 @@
 '''
-@file   mlonnmDataMining_test.py  
-@author Thanasis Mattas, 2019  
+@file   sorvspoisson_test.py
+@author Thanasis Mattas, 2019
 
-tests of mlonnmDataMining.py  
+tests of sorvspoisson.py
 
-MLonNM is free software; you may redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
+SORvsPoisson is free software; you may redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later
 version. You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 '''
 
-
-import sor
-import pytest
+import sorvspoisson as sor
 import numpy as np
 
 
@@ -35,7 +33,7 @@ def test_mesh():
          [1, 1, 1, 1],
          [2, 2, 2, 2],
          [3, 3, 3, 3]]
-    assert sor.mesh(3, 3, 1) == X,Y
+    assert sor.mesh(3, 3, 1) == X, Y
 
 
 def test_e_r():
@@ -51,8 +49,8 @@ def test_e_r():
 
     a, b, c = 1, 2, 1
 
-    result = [[ 1,  1,  1,  1],
-              [ 4,  4,  4,  4],
+    result = [[1, 1, 1, 1],
+              [4, 4, 4, 4],
               [11, 11, 11, 11],
               [22, 22, 22, 22]]
     assert(sor.e_r(a, b, c, X, Y) == result)
@@ -72,22 +70,22 @@ def test_source():
     result = [[- 3, - 4, - 7],
               [- 5, - 6, - 9],
               [-11, -12, -15]]
-             
+
     assert(sor.charge_density(p, q, r, X, Y) == result)
 
 
-    def test_combinations():
-        L = np.array([1, 2])
-        d = np.array([11, 22])
-        w = np.array([111, 222])
+def test_combinations():
+    L = np.array([1, 2])
+    d = np.array([11, 22])
+    w = np.array([111, 222])
 
-        result = [[1, 11, 111],
-                  [1, 11, 222],
-                  [1, 22, 111],
-                  [1, 22, 222],
-                  [2, 11, 111],
-                  [2, 11, 222],
-                  [2, 22, 111],
-                  [2, 22, 222]]
+    result = [[1, 11, 111],
+              [1, 11, 222],
+              [1, 22, 111],
+              [1, 22, 222],
+              [2, 11, 111],
+              [2, 11, 222],
+              [2, 22, 111],
+              [2, 22, 222]]
 
-        assert(sor.combinations(L, d, w) == result)
+    assert(sor.combinations(L, d, w) == result)

@@ -1,16 +1,16 @@
 '''
-@file   mlonnmDataMining.py  
-@author Thanasis Mattas, 2019  
+@file   sorvspoisson.py
+@author Thanasis Mattas, 2019
 
-Handles the data mining of the project  
+Produces different scenarios for further meta-analysis of the solution
+parameters selection.
 
-MLonNM is free software; you may redistribute it and/or modify it under the
-terms of the GNU General Public License as published by the Free Software
+SORvsPoisson is free software; you may redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
 Foundation, either version 3 of the License, or (at your option) any later
 version. You should have received a copy of the GNU General Public License
 along with this program. If not, see <https://www.gnu.org/licenses/>.
 '''
-
 
 import numpy as np
 import itertools
@@ -50,9 +50,9 @@ def mesh(L, W, h):
     """
     generates a cartetian (stuctured) mesh
     --------------------------------------
-    @L             : length along x axis  
-    @W             : width along y axis  
-    @h             : descritization step  
+    @L             : length along x axis
+    @W             : width along y axis
+    @h             : descritization step
     returns X, Y   : np.meshgrid
     """
     x = np.arange(0, L + h, h)
@@ -68,8 +68,8 @@ def permittivity(a, b, c, h, *meshgrid):
     """
     # permittivity populates the staggered mesh
     X, Y = meshgrid
-    X = X + h/2
-    Y = Y + h/2
+    X = X + h / 2
+    Y = Y + h / 2
     X = X[:-1, :-1]
     Y = Y[:-1, :-1]
     return a * X**2 + b * Y**2 + c
@@ -88,13 +88,13 @@ def source(p, q, r, *meshgrid):
 def combinations(*args):
     """
     It takes all the feature-lists, where each feature-list contains the
-    different values  
+    different values
     that the corresponding feature takes, and creates all possible combinations.
-    Namely,  
+    Namely,
     every combination (simulation configuration) will have one value of each
     feature-list.
 
-    @param *args         : iterable of iterables (list of feature-lists)  
+    @param *args         : iterable of iterables (list of feature-lists)
     returns comb_list    : iterable of iterables (list of combinations)
     """
     comb_list = []
@@ -107,13 +107,13 @@ def boundaryConditions(u, f):
     """
     applies Neumann boundary conditions
     -----------------------------------
-    The rate of change of the function u at the borders of the domain is equal  
-    to the rate of change of the source function f. The rates are evaluated,  
-    using 1st order central differences.  
+    The rate of change of the function u at the borders of the domain is equal
+    to the rate of change of the source function f. The rates are evaluated,
+    using 1st order central differences.
 
     currently: left and right borders
     """
-    
+
     # - top    (du/dy = df/dy)
     #   (u(i, 0) - u(i, 2)) / 2h = (f(i, 0) - f(i, 2)) / 2h
     # u[0, :] = u[2, :] + f[0, :] - f[2, :]
@@ -138,7 +138,7 @@ def initialization(L, W, Nx, Ny, u_top, u_bot, f, *meshgrid):
     # populate the mesh with function u
     u = np.zeros_like(X)
     # apply Dirichlet boundary conditions
-    u[ 0, :] = u_top
+    u[0, :] = u_top
     u[-1, :] = u_bot
     # u[:, 0] = u_left
     # u[:, -1] = u_right
@@ -178,7 +178,7 @@ def factors(perm):
     """
     generates the factors of the 5-point Liebmann scheme
     ----------------------------------------------------
-    @param perm                 : permittivity distribution on the mesh  
+    @param perm                 : permittivity distribution on the mesh
     returns a0, a1, a2, a3, a4  : the factors
     """
     # a0 = e_r(i-1, j) + e_r(i, j) + e_r(i, j-1) + e_r(i-1, j-1)
@@ -200,7 +200,6 @@ def main():
     # - max iterations
     __TOL__ = 10**-5
     __ITER_MAX__ = 2 * 10**5
-
 
     # features (dimensions) of the problem (9)
     # --------
@@ -227,7 +226,7 @@ def main():
     #            perm = ax^2 + by^2 + c
     a = np.linspace(-0.2, 0.3, 3)
     b = np.linspace(-0.2, 0.3, 3)
-    c = np.linspace( 1.5, 2.5, 3)
+    c = np.linspace(1.5, 2.5, 3)
 
     # source or forcing function, f(x,y) = px^2 + qy^2 + r
     p = np.linspace(-10, -2, 3)
@@ -242,8 +241,10 @@ def main():
 
     # print dataset in pandas DataFrame format
     test_indices = [0, 1000, 2000, 10000, 15000]
-    df = pd.DataFrame([dataset[point] for point in test_indices],
-        columns=['L', 'W', 'h', 'a', 'b', 'c', 'p', 'q', 'r', 'u_top', 'u_bot'])
+    df = pd.DataFrame(
+        [dataset[point] for point in test_indices],
+        columns=['L', 'W', 'h', 'a', 'b', 'c', 'p', 'q', 'r', 'u_top', 'u_bot']
+    )
     # print(df[:1])
 
     # this will hold the optimum omega for all datapoints and it will constitute
@@ -314,15 +315,17 @@ def main():
                     #                                      a4
                     #                                 - h^2 f(i,j)]
                     #
-                    u_new = u[1:-1, 1:-1] + omega / a0 * (  a3 * u[1:-1,  :-2]
-                                                          + a2 * u[2:  , 1:-1]
-                                                          + a1 * u[1:-1, 2:  ]
-                                                          + a4 * u[ :-2, 1:-1]
-                                                          - a0 * u[1:-1, 1:-1]
-                                                        - h**2 * f[1:-1, 1:-1] )
+                    u_new = u[1:-1, 1:-1] + omega / a0 * (
+                        a3 * u[1:-1, :-2]
+                        + a2 * u[2:, 1:-1]
+                        + a1 * u[1:-1, 2:]
+                        + a4 * u[:-2, 1:-1]
+                        - a0 * u[1:-1, 1:-1]
+                        - h**2 * f[1:-1, 1:-1]
+                    )
                     # mean residual of the nodes
-                    tolerance = np.sum(np.abs(u_new - u[1:-1, 1:-1])) \
-                                / ((Nx - 2) * (Ny - 2))
+                    tolerance = (np.sum(np.abs(u_new - u[1:-1, 1:-1]))
+                                 / ((Nx - 2) * (Ny - 2)))
 
                     u[1:-1, 1:-1] = u_new
                     print('iter: ', iter, '  tol: {0:.7f}'.format(tolerance))
@@ -338,8 +341,8 @@ def main():
                     tol = tolerance
 
         end = timer()
-        min = str(int(np.floor((end-start)) / 60))
-        sec = str(int((end-start) % 60))
+        min = str(int(np.floor((end - start)) / 60))
+        sec = str(int((end - start) % 60))
         min_zeros = (2 - len(str(min))) * '0'
         sec_zeros = (2 - len(str(sec))) * '0'
         dtpoint_duration = min_zeros + min + ':' + sec_zeros + sec
@@ -365,7 +368,6 @@ def main():
                            'display.max_columns', None):
         print(df)
 
-    """
     fig = plt.figure()
 
     sub1 = fig.add_subplot(121, projection='3d')
@@ -373,21 +375,20 @@ def main():
     sub1.title.set_text('u')
     sub1.set_xlabel('x')
     sub1.set_ylabel('y')
-    sub1.set_zlabel('u')        
+    sub1.set_zlabel('u')
 
     sub2 = fig.add_subplot(122, projection='3d')
     sub2.plot_surface(X[1:-1, 1:-1], Y[1:-1, 1:-1], f[1:-1, 1:-1])
     sub2.title.set_text('f')
     sub2.set_xlabel('x')
     sub2.set_ylabel('y')
-    sub2.set_zlabel('f')        
+    sub2.set_zlabel('f')
 
     # sub3 = fig.add_subplot(133, projection='3d')
     # sub3.plot_surface(X[1:,1:], Y[1:,1:], perm)
     # sub3.title.set_text('perm')
 
     plt.show()
-    """
 
 
 if __name__ == '__main__':
